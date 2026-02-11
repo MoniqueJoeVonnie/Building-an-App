@@ -1,7 +1,11 @@
+let books;
+
 function renderBooks(filter) {
   const booksWrapper = document.querySelector(".books");
 
+  document.body.classList += ' books__loading'
   const books = getBooks();
+  document.body.classList.remove('books__loading')
 
   if (filter === 'LOW_TO_HIGH') {
     books.sort((a, b) => (a.salePrice ?? a.originalPrice) - (b.salePrice ?? b.originalPrice));
@@ -13,10 +17,6 @@ function renderBooks(filter) {
 
   const booksHTML = books
     .map((book) => {
-      const priceHTML = book.salePrice
-        ? `<span class="book__price--sale">$${book.salePrice.toFixed(2)}</span> <span class="book__price--original">$${book.originalPrice.toFixed(2)}</span>`
-        : `<span class="book__price--original">$${book.originalPrice.toFixed(2)}</span>`;
-
       return `<div class="book">
         <figure class="book__img--wrapper">
           <img class="book__img" src="${book.url}" alt="">
@@ -27,14 +27,23 @@ function renderBooks(filter) {
         <div class="book__ratings">
           ${ratingsHTML(book.rating)}
         </div>
-        <div class="book__price">
-          ${priceHTML}
+         <div class="book__price">
+              ${priceHTML(book.originalPrice, book.salePrice)}
+            </div>
         </div>
       </div>`;
     })
     .join("");
 
   booksWrapper.innerHTML = booksHTML;
+}
+
+function priceHTML(originalPrice, salePrice) {
+  if (!salePrice) {
+    return `$${originalPrice.toFixed(2)}`;
+  } else {
+    return `<span class="book__price--normal">$${originalPrice.toFixed(2)}</span> $${salePrice.toFixed(2)}`;
+  }
 }
 
 function ratingsHTML(rating) {
@@ -54,7 +63,7 @@ function filterBooks(event) {
 
 setTimeout(() => {
   renderBooks();
-}, 0);
+});
 
 // FAKE DATA
 function getBooks() {
@@ -149,3 +158,6 @@ function getBooks() {
     },
   ];
 }
+
+
+
